@@ -49,6 +49,7 @@
                 <action android:name="android.intent.action.PHONE_STATE" />
                 <action android:name="android.provider.MediaStore.RECORD_SOUND" />
                 <action android:name="org.lineageos.recorder.server.display.SCAN" />
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -69,6 +70,18 @@
         <!-- Screen recorder overlay -->
         <service android:name=".screen.OverlayService" />
 
+        <!-- Screen recorder tile -->
+        <service
+            android:name="org.lineageos.recorder.screen.RecorderTileService"
+            android:icon="@drawable/ic_recorder_tile"
+            android:label="@string/main_screen_action"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action
+                    android:name="android.service.quicksettings.action.QS_TILE"/>
+            </intent-filter>
+        </service>
+
         <receiver
             android:name=".screen.ScreencastStartReceiver"
             android:permission="android.permission.CAPTURE_SECURE_VIDEO_OUTPUT">
@@ -77,6 +90,8 @@
                 <action android:name="org.lineageos.recorder.screen.ACTION_STOP_SCREENCAST" />
             </intent-filter>
         </receiver>
+
+        <receiver android:name=".screen.RecordTileReceiver" />
 
         <receiver
             android:name=".screen.ScreencastControlReceiver"
