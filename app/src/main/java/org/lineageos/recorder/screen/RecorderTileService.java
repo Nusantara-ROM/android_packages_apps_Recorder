@@ -72,6 +72,9 @@ public class RecorderTileService extends TileService {
               changeTileState(Tile.STATE_ACTIVE);
         Intent intent = new Intent(this, RecordTileReceiver.class);
         sendBroadcast(intent);
+
+        Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        sendBroadcast(closeIntent);
     }
 
     private void updateTile() {
