@@ -18,12 +18,12 @@ package org.lineageos.recorder.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import androidx.annotation.NonNull;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import org.lineageos.recorder.R;
+import androidx.annotation.NonNull;
 
 public class OnBoardingHelper {
     private static final String ONBOARD_SCREEN_SETTINGS = "onboard_screen_settings";
@@ -64,7 +64,7 @@ public class OnBoardingHelper {
     }
 
     private static SharedPreferences getPrefs(Context context) {
-        return context.getSharedPreferences(Utils.PREFS, 0);
+        return context.getSharedPreferences(PreferenceUtils.PREFS, 0);
     }
 
     @NonNull
