@@ -32,7 +32,6 @@ import java.io.Closeable;
 import java.io.IOException;
 
 public class Utils {
-    public static final String SCREEN_PREFS = "screen_preferences";
     public static final String ACTION_RECORDING_STATE_CHANGED = "org.lineageos.recorder.RECORDING_STATE_CHANGED";
     public static final String ACTION_HIDE_ACTIVITY = "org.lineageos.recorder.HIDE_ACTIVITY";
     public static final String PREF_RECORDING_NOTHING = "nothing";

@@ -27,8 +27,8 @@ import androidx.core.app.NotificationCompat;
 
 import org.lineageos.recorder.R;
 import org.lineageos.recorder.RecorderActivity;
+import org.lineageos.recorder.SettingsActivity;
 import org.lineageos.recorder.ui.OverlayLayer;
-import org.lineageos.recorder.utils.Utils;
 
 public class OverlayService extends Service {
 
@@ -55,9 +55,8 @@ public class OverlayService extends Service {
             onDestroy();
         });
         mLayer.setSettingsButtonOnClickListener(() -> {
-            Intent intent_ = new Intent(this, RecorderActivity.class);
+            Intent intent_ = new Intent(this, SettingsActivity.class);
             intent_.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent_.putExtra(RecorderActivity.EXTRA_UI_TYPE, Utils.SCREEN_PREFS);
             startActivity(intent_);
             onDestroy();
         });
