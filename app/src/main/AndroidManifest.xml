@@ -53,8 +53,6 @@
                 <action android:name="android.provider.MediaStore.RECORD_SOUND" />
                 <action android:name="org.lineageos.recorder.server.display.SCAN" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
             </intent-filter>
         </activity>
