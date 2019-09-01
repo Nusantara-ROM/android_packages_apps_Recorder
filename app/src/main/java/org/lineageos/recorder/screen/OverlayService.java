@@ -29,6 +29,7 @@ import org.lineageos.recorder.R;
 import org.lineageos.recorder.RecorderActivity;
 import org.lineageos.recorder.SettingsActivity;
 import org.lineageos.recorder.ui.OverlayLayer;
+import org.lineageos.recorder.utils.Utils;
 
 public class OverlayService extends Service {
 
@@ -47,6 +48,9 @@ public class OverlayService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int id) {
+        if (Utils.isScreenRecording()){
+            stopSelf();
+        }
         mLayer = new OverlayLayer(this);
         mLayer.setOnActionClickListener(() -> {
             Intent intent_ = new Intent(this, StartScreenRecorder.class);
