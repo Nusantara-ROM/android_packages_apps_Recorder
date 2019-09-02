@@ -39,6 +39,7 @@ import java.lang.reflect.Method;
 
 public class Utils {
     public static final String ACTION_RECORDING_STATE_CHANGED = "org.lineageos.recorder.RECORDING_STATE_CHANGED";
+    public static final String ACTION_RECORDING_TIME_TICK = "org.lineageos.recorder.RECORDING_TIME_TICK";
     public static final String ACTION_HIDE_ACTIVITY = "org.lineageos.recorder.HIDE_ACTIVITY";
     public static final String PREF_RECORDING_NOTHING = "nothing";
     public static final String PREF_RECORDING_SCREEN = "screen";
@@ -151,6 +152,7 @@ public class Utils {
         // Stop overlay service if running
         if (OverlayService.isRunning) {
             context.stopService(new Intent(context, OverlayService.class));
+            OverlayService.isRunning = false;
         }
     }
 
