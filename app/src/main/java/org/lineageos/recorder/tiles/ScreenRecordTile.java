@@ -97,10 +97,6 @@ public class ScreenRecordTile extends TileService {
         if (!PermissionUtils.hasDrawOverOtherAppsPermission(this)) {
             return false;
         }
-
-        if (!PermissionUtils.hasStoragePermission(this)) {
-            return false;
-        }
         return true;
     }
 }
