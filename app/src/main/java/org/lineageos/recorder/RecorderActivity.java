@@ -281,7 +281,6 @@ public class RecorderActivity extends AppCompatActivity {
         if (mSoundService.isRecording()) {
             // Stop
             mSoundService.stopRecording();
-            mSoundService.createShareNotification();
             stopService(new Intent(this, SoundRecorderService.class));
             Utils.setStatus(Utils.UiStatus.NOTHING, this);
         } else {

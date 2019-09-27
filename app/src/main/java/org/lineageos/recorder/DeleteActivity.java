@@ -2,6 +2,7 @@ package org.lineageos.recorder;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.net.Uri;
 import android.os.Bundle;
 
 import org.lineageos.recorder.utils.LastRecordHelper;
@@ -16,8 +17,8 @@ public class DeleteActivity extends Activity {
     }
 
     private void deleteLastItem(boolean isSound) {
-        String path = LastRecordHelper.getLastItemPath(this, isSound);
-        AlertDialog dialog = LastRecordHelper.deleteFile(this, path, isSound);
+        Uri uri = LastRecordHelper.getLastItemUri(this, isSound);
+        AlertDialog dialog = LastRecordHelper.deleteFile(this, uri, isSound);
         dialog.setOnDismissListener(d -> finish());
         dialog.show();
     }

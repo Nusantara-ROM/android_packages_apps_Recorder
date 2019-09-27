@@ -22,8 +22,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
-import androidx.core.content.FileProvider;
-
 import org.lineageos.recorder.DeleteActivity;
 import org.lineageos.recorder.R;
 import org.lineageos.recorder.screen.ScreencastService;
@@ -37,21 +35,16 @@ public class LastRecordHelper {
     private static final String KEY_LAST_SCREEN = "screen_last_path";
     private static final String KEY_LAST_SOUND_TIME = "sound_last_duration";
     private static final String KEY_LAST_SCREEN_TIME = "screen_last_duration";
-    private static final String FILE_PROVIDER = "org.lineageos.recorder.fileprovider";
 
     private LastRecordHelper() {
     }
 
-    public static AlertDialog deleteFile(Context context, final String path, boolean isSound) {
-        return new AlertDialog.Builder(context, R.style.CustomDialogTheme)
+    public static AlertDialog deleteFile(Context context, final Uri uri, boolean isSound) {
+        return new AlertDialog.Builder(context)
                 .setTitle(R.string.delete_title)
-                .setMessage(context.getString(R.string.delete_message, path))
+                .setMessage(context.getString(R.string.delete_message, uri))
                 .setPositiveButton(R.string.delete, (dialog, which) -> {
-                    File record = new File(path);
-                    if (record.exists()) {
-                        //noinspection ResultOfMethodCallIgnored
-                        record.delete();
-                    }
+                    MediaProviderHelper.remove(context.getContentResolver(), uri);
                     NotificationManager nm = context.getSystemService(NotificationManager.class);
                     if (nm == null) {
                         return;
@@ -68,20 +61,16 @@ public class LastRecordHelper {
                 .create();
     }
 
-    public static Intent getShareIntent(Context context, String filePath, String mimeType) {
-        File file = new File(filePath);
-        Uri uri = FileProvider.getUriForFile(context, FILE_PROVIDER, file);
+
+    public static Intent getShareIntent(Uri uri, String mimeType) {
         Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType(mimeType);
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        intent.putExtra(Intent.EXTRA_SUBJECT, file.getName());
+        intent.setDataAndType(uri, mimeType);
         Intent chooserIntent = Intent.createChooser(intent, null);
         chooserIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         return chooserIntent;
     }
 
-    public static Intent getOpenIntent(Context context, String filePath, String mimeType) {
-        Uri uri = FileProvider.getUriForFile(context, FILE_PROVIDER, new File(filePath));
+    public static Intent getOpenIntent(Uri uri, String mimeType) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(uri, mimeType);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -103,9 +92,9 @@ public class LastRecordHelper {
                 .apply();
     }
 
-    public static String getLastItemPath(Context context, boolean isSound) {
+    public static Uri getLastItemUri(Context context, boolean isSound) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS, 0);
-        return prefs.getString(isSound ? KEY_LAST_SOUND : KEY_LAST_SCREEN, null);
+        String uriStr = prefs.getString(isSound ? KEY_LAST_SOUND : KEY_LAST_SCREEN, null);
+        return uriStr == null ? null : Uri.parse(uriStr);
     }
-
 }

@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioSystem;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -34,19 +35,23 @@ import android.telephony.TelephonyManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.lineageos.recorder.R;
 import org.lineageos.recorder.RecorderActivity;
 import org.lineageos.recorder.utils.LastRecordHelper;
+import org.lineageos.recorder.utils.MediaProviderHelper;
 import org.lineageos.recorder.utils.PreferenceUtils;
 import org.lineageos.recorder.utils.Utils;
 
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ScreencastService extends Service implements ScreenRecorder.ScreenRecorderResultCallback {
+public class ScreencastService extends Service implements ScreenRecorder.ScreenRecorderResultCallback,
+                                                             MediaProviderHelper.OnContentWritten {
 
     private static final String SCREENCAST_NOTIFICATION_CHANNEL =
             "screencast_notification_channel";
@@ -64,6 +69,7 @@ public class ScreencastService extends Service implements ScreenRecorder.ScreenR
     private NotificationManager mNotificationManager;
     private boolean mAlreadyNotified = false;
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
@@ -278,11 +284,19 @@ public class ScreencastService extends Service implements ScreenRecorder.ScreenR
         stopRecording(false);
     }
 
+
+    @Override
+    public void onContentWritten(@Nullable String uri) {
+        stopForeground(true);
+        if (uri != null) {
+            sendShareNotification(uri);
+        }
+    }
+
     private void stopRecording(boolean fromOnDestroy) {
         Utils.stopOverlayService(this);
         Utils.setStatus(Utils.PREF_RECORDING_NOTHING, this);
         mHandler.removeCallbacksAndMessages(null);
-
         String recorderPath = null;
         if (mRecorder != null) {
             mRecorder.setStopping(true);
@@ -291,9 +305,10 @@ public class ScreencastService extends Service implements ScreenRecorder.ScreenR
             mRecorder = null;
         }
         stopTimer();
-        stopForeground(true);
-        if (!fromOnDestroy && recorderPath != null) {
-            sendShareNotification(recorderPath);
+            Log.e(LOGTAG, "Path: " +recorderPath);
+
+        if (!fromOnDestroy) {
+            MediaProviderHelper.addVideoToContentProvider(getContentResolver(), new File(recorderPath), this);
         } else if (!fromOnDestroy && !mAlreadyNotified) {
             Utils.notifyError(getString(R.string.unknow_error), true, ScreencastService.this, mNotificationManager, false);
         }
@@ -324,20 +339,21 @@ public class ScreencastService extends Service implements ScreenRecorder.ScreenR
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 
-    private NotificationCompat.Builder createShareNotificationBuilder(String file) {
+    private NotificationCompat.Builder createShareNotificationBuilder(String uriStr) {
+        Uri uri = Uri.parse(uriStr);
         PendingIntent playPIntent = PendingIntent.getActivity(this, 0,
-                LastRecordHelper.getOpenIntent(this, file, "video/mp4"),
+                LastRecordHelper.getOpenIntent(uri, "video/mp4"),
                 PendingIntent.FLAG_CANCEL_CURRENT);
         PendingIntent sharePIntent = PendingIntent.getActivity(this, 0,
-                LastRecordHelper.getShareIntent(this, file, "video/mp4"),
+                LastRecordHelper.getShareIntent(uri, "video/mp4"),
                 PendingIntent.FLAG_CANCEL_CURRENT);
         PendingIntent deletePIntent = PendingIntent.getActivity(this, 0,
                 LastRecordHelper.getDeleteIntent(this, false),
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
-        LastRecordHelper.setLastItem(this, file, sElapsedTimeInSeconds, false);
+        Log.e(LOGTAG, "Uri: " +uriStr);
 
-        Log.i(LOGTAG, "Video complete: " + file);
+        LastRecordHelper.setLastItem(this, uriStr, sElapsedTimeInSeconds, false);
 
         return new NotificationCompat.Builder(this, Utils.RECORDING_DONE_NOTIFICATION_CHANNEL)
                 .setWhen(System.currentTimeMillis())
