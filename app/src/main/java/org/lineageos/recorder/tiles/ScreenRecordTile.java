@@ -42,14 +42,14 @@ public class ScreenRecordTile extends TileService {
                 Utils.collapseStatusBar(this, wasLocked);
                 new Handler().postDelayed(() -> {
                     Utils.setStatus(Utils.UiStatus.NOTHING, this);
-                    startService(new Intent(ScreencastService.ACTION_STOP_SCREENCAST)
+                    startForegroundService(new Intent(ScreencastService.ACTION_STOP_SCREENCAST)
                             .setClass(this, ScreencastService.class));
                 }, wasLocked ? 1000 : 500);
             } else if (hasPerms()) {
                 Utils.collapseStatusBar(this, wasLocked);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Utils.ACTION_HIDE_ACTIVITY));
                 Intent intent = new Intent(this, OverlayService.class);
-                startService(intent);
+                startForegroundService(intent);
             } else {
                 Intent intent = new Intent(this, RecorderActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
